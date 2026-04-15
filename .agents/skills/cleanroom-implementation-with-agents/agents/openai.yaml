@@ -1,0 +1,6 @@
+interface:
+  display_name: "Cleanroom Implementation With Agents"
+  short_description: "Repo-specific patterns and workflows for cleanroom-implementation-with-agents"
+  default_prompt: "Use the cleanroom-implementation-with-agents repo skill to follow existing architecture, testing, and workflow conventions."
+policy:
+  allow_implicit_invocation: true
