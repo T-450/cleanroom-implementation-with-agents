@@ -1,6 +1,6 @@
 # Clean Room Implementation with AI Agents
 
-This repository documents a complete methodology for implementing enterprise-scale software systems using **clean room engineering** principles combined with **AI agent orchestration**. The approach enables organizations to recreate complex legacy systems without accessing the original source code, maintaining full legal defensibility while leveraging autonomous AI agents for accelerated development.
+This repository documents a complete methodology for implementing **clean room engineering** principles combined with **AI agents**. The approach enables organizations to recreate complex legacy systems without accessing the original source code, maintaining full legal defensibility while leveraging autonomous AI agents for accelerated development.
 
 ## What is Clean Room Implementation?
 
