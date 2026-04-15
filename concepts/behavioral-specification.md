@@ -11,6 +11,50 @@ sources: []
 
 Behavioral specification documents **what a system does**, not **how it does it**. In clean room development, this is the ONLY source of truth since you cannot access the original source code. Every specification must be expressed as executable tests.
 
+## Information Flow Diagram
+
+```mermaid
+flowchart LR
+    subgraph Original["📡 Original System"]
+        A[API Endpoints]
+        B[User Interface]
+        C[Database]
+    end
+    
+    subgraph Observation["🔍 Observation Phase"]
+        D[API Probing<br/>24/7]
+        E[State Discovery]
+        F[Edge Case Hunting]
+    end
+    
+    subgraph Specification["📝 Specification Phase"]
+        G[Executable Tests]
+        H[Behavioral Docs]
+        I[Contract Specs]
+    end
+    
+    subgraph Implementation["💻 Implementation Phase"]
+        J[TDD Cycle]
+        K[Code Generation]
+    end
+    
+    A --> D
+    B --> E
+    C --> F
+    D --> G
+    E --> H
+    F --> I
+    G --> J
+    H --> J
+    I --> J
+    J --> K
+    
+    style Original fill:#2c3e50,stroke:#3498db,stroke-width:2px,color:#fff
+    style Observation fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
+    style Specification fill:#f39c12,stroke:#d68910,stroke-width:2px,color:#fff
+    style Implementation fill:#27ae60,stroke:#2ecc71,stroke-width:2px,color:#fff
+```
+
 ## Definition
 
 A behavioral specification is a complete, executable description of system behavior that:

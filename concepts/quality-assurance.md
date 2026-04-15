@@ -9,7 +9,48 @@ sources: []
 
 # Quality Assurance
 
-Quality assurance (QA) in clean room implementation is the comprehensive process of verifying that the new system matches the original in behavior, performance, and reliability. Unlike traditional QA which tests against requirements, clean room QA tests against the ORIGINAL SYSTEM as the oracle.
+Quality assurance (QA) in clean room implementation is the comprehensive process of verifying that the new system matches the original in behavior, performance, and reliability. Unlike traditional QA which tests against requirements, clean room QA tests against the **ORIGINAL SYSTEM** as the oracle.
+
+## QA Process Flow
+
+```mermaid
+flowchart TD
+    subgraph Planning["📋 Test Planning"]
+        A[Behavioral Specs] --> B[Test Suite Creation]
+        B --> C[Performance Baselines]
+    end
+    
+    subgraph Execution["⚡ Test Execution"]
+        D[Original System<br/>Oracle] --> E[New System<br/>Implementation]
+        D --> F[Capture Output A]
+        E --> G[Capture Output B]
+    end
+    
+    subgraph Comparison["⚖️ Result Comparison"]
+        F --> H{Compare Results}
+        G --> H
+        H -->|Match| I[✅ Verification Pass]
+        H -->|Mismatch| J[🔍 Investigation]
+    end
+    
+    subgraph Remediation["🔧 Remediation"]
+        J --> K{Root Cause}
+        K -->|New System Bug| L[Fix Implementation]
+        K -->|Original Bug| M[Document Issue]
+        K -->|Spec Gap| N[Update Specification]
+    end
+    
+    C --> Execution
+    I --> O[📊 Report & Metrics]
+    L --> E
+    M --> O
+    N --> A
+    
+    style Planning fill:#34495e,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style Execution fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    style Comparison fill:#f39c12,stroke:#d68910,stroke-width:2px,color:#fff
+    style Remediation fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
+```
 
 ## QA Principles
 

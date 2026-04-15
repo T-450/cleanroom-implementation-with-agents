@@ -1,10 +1,67 @@
 # Clean Room Implementation with AI Agents Wiki Index
 
-> Content catalog. Every wiki page listed under its type with a one-line summary.
-> Read this first to find relevant pages for any query.
-> Last updated: 2026-04-15 | Total pages: 15
+<div align="center">
 
-## Concepts
+```
+  📚 WIKI KNOWLEDGE GRAPH 📚
+```
+
+**Total Pages**: 16+ | **Wikilinks**: 100+ | **Last Updated**: 2026-04-15
+
+</div>
+
+## Knowledge Graph Overview
+
+```mermaid
+graph TD
+    subgraph Core["🔷 Core Concepts"]
+        A[clean-room-engineering]
+        B[behavioral-specification]
+        C[test-driven-development]
+        D[parallel-testing-strategy]
+        E[quality-assurance]
+        F[migration-strategy]
+    end
+    
+    subgraph Agents["🤖 AI Agents"]
+        G[ai-agent-methodologies]
+        H[multi-agent-coordination]
+        I[ai-agent-patterns]
+    end
+    
+    subgraph Legal["⚖️ Legal"]
+        J[legal-framework]
+        K[legal-risk-assessment]
+        L[insider-knowledge-risks]
+    end
+    
+    subgraph Queries["📝 Queries"]
+        M[clean-room-implementation-checklist]
+        N[practical-implementation-guide]
+        O[delegate-task-workflows]
+    end
+    
+    A --> B
+    B --> C
+    C --> E
+    E --> F
+    A --> G
+    G --> H
+    H --> I
+    A --> J
+    J --> K
+    K --> L
+    F --> M
+    M --> N
+    N --> O
+    
+    style Core fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    style Agents fill:#9b59b6,stroke:#8e44ad,stroke-width:2px,color:#fff
+    style Legal fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
+    style Queries fill:#27ae60,stroke:#2ecc71,stroke-width:2px,color:#fff
+```
+
+## Content Catalog
 
 ### Core Concepts
 

@@ -11,6 +11,60 @@ sources: []
 
 This page covers the core methodologies for using AI agents in clean room implementation. These methodologies define how autonomous AI agents observe, specify, implement, and verify clean room projects without violating isolation requirements.
 
+## Agent Architecture Overview
+
+```mermaid
+flowchart TB
+    subgraph Layer1["🎯 Orchestration Layer"]
+        P[Project Coordinator Agent]
+    end
+    
+    P --> O
+    P --> I
+    P --> V
+    
+    subgraph Observation["📋 Observation Team"]
+        O1[API Probe Agent]
+        O2[State Machine Agent]
+        O3[Edge Case Agent]
+        O4[Spec Writer Agent]
+    end
+    
+    subgraph Implementation["💻 Implementation Team"]
+        I1[TDD Agent]
+        I2[Test Writer Agent]
+        I3[Refactor Agent]
+        I4[Spec-Driven Agent]
+    end
+    
+    subgraph Verification["✅ Verification Team"]
+        V1[Parity Test Agent]
+        V2[Regression Agent]
+        V3[Performance Agent]
+        V4[Security Agent]
+    end
+    
+    O1 --> O
+    O2 --> O
+    O3 --> O
+    O4 --> O
+    
+    I1 --> I
+    I2 --> I
+    I3 --> I
+    I4 --> I
+    
+    V1 --> V
+    V2 --> V
+    V3 --> V
+    V4 --> V
+    
+    style Layer1 fill:#8e44ad,stroke:#6c3483,stroke-width:3px,color:#fff
+    style Observation fill:#3498db,stroke:#2980b9,stroke-width:3px,color:#fff
+    style Implementation fill:#e67e22,stroke:#d35400,stroke-width:3px,color:#fff
+    style Verification fill:#27ae60,stroke:#2ecc71,stroke-width:3px,color:#fff
+```
+
 ## Core Principles
 
 ### Principle 1: Agent Role Separation

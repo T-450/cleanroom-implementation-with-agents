@@ -11,7 +11,63 @@ sources: []
 
 Parallel testing is the core verification mechanism for clean room implementation. The new system runs side-by-side with the original, and both produce identical results for the same inputs. This provides continuous verification that the new implementation matches the original behavior.
 
-## The Parallel Testing Principle
+## Parallel Testing Flow
+
+```mermaid
+flowchart LR
+    subgraph Input["📥 Test Input"]
+        A[Test Case]
+    end
+    
+    A --> B{Execute}
+    
+    B -->|Route 1| C[🏛️ Original System]
+    B -->|Route 2| D[🆕 New System]
+    
+    C --> E[Output A]
+    D --> F[Output B]
+    
+    E --> G{⚖️ Compare}
+    F --> G
+    
+    G -->|Match| H[✅ Verification Passed]
+    G -->|Mismatch| I[🔍 Divergence Detected]
+    
+    I --> J{Classification}
+    J -->|Bug in New| K[🐛 Fix Implementation]
+    J -->|Bug in Original| L[📝 Document Original Issue]
+    J -->|Intentional| M[✨ Update Spec for Improvement]
+    
+    style Input fill:#34495e,stroke:#2c3e50,stroke-width:2px,color:#fff
+    style Original fill:#2c3e50,stroke:#3498db,stroke-width:2px,color:#fff
+    style New fill:#27ae60,stroke:#2ecc71,stroke-width:2px,color:#fff
+    style Compare fill:#f39c12,stroke:#d68910,stroke-width:3px,color:#fff
+    style Passed fill:#27ae60,stroke:#2ecc71,stroke-width:2px,color:#fff
+    style Detected fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
+```
+
+## Information Flow Control
+
+```mermaid
+flowchart TD
+    subgraph Allowed["✅ Allowed Flows"]
+        A1[Observation] -->|Behavioral Data| B1[Specification]
+        B1 -->|Test Cases| C1[Implementation]
+        C1 -->|Results| D1[Verification]
+        D1 -->|Reports| E1[Orchestration]
+    end
+    
+    subgraph Forbidden["❌ Forbidden Flows"]
+        F1[Original System] -.->|Direct Access| G1[Implementation]
+        F2[Observation] -.->|Direct Access| G2[Implementation]
+        H1[Implementation] -.->|Feedback| I1[Observation]
+    end
+    
+    style Allowed fill:#27ae60,stroke:#1e8449,stroke-width:3px,color:#fff
+    style Forbidden fill:#e74c3c,stroke:#c0392b,stroke-width:3px,color:#fff
+```
+
+## Testing Phases
 
 ```
 PARALLEL_TESTING_CORE_CONCEPT:

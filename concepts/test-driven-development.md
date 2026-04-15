@@ -11,6 +11,36 @@ sources: []
 
 Test-driven development (TDD) is the PRIMARY mechanism for creating behavioral specifications in clean room implementation. Every feature is implemented through the red-green-refactor cycle, where tests capture the observed behavior of the original system.
 
+## TDD Cycle Diagram
+
+```mermaid
+graph TD
+    subgraph TDD["🔄 Red-Green-Refactor Cycle"]
+        A[🔴 RED<br/>Write Failing Test] --> B{Test Passes?}
+        B -->|No| C[🟢 GREEN<br/>Minimal Implementation]
+        C --> D{Test Passes?}
+        D -->|No| C
+        D -->|Yes| E[🟡 REFACTOR<br/>Improve Code]
+        E --> F{Tests Still Pass?}
+        F -->|No| C
+        F -->|Yes| A
+    end
+    
+    subgraph Verification["✅ Verification"]
+        G[Test Against Original] --> H{Behavior Matches?}
+        H -->|Yes| I[✅ Parity Confirmed]
+        H -->|No| J[🔍 Investigate]
+    end
+    
+    E --> G
+    
+    style TDD fill:#34495e,stroke:#2c3e50,stroke-width:3px,color:#fff
+    style Verification fill:#27ae60,stroke:#2ecc71,stroke-width:3px,color:#fff
+    style A fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
+    style C fill:#27ae60,stroke:#2ecc71,stroke-width:2px,color:#fff
+    style E fill:#f39c12,stroke:#d68910,stroke-width:2px,color:#fff
+```
+
 ## The Red-Green-Refactor Cycle
 
 ### RED — Write Failing Test

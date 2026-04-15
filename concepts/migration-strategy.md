@@ -36,6 +36,66 @@ STRANGLER FIG (RECOMMENDED):
   ✓ Minimal business disruption
 ```
 
+## Migration Patterns Comparison
+
+```mermaid
+flowchart TB
+    subgraph BigBang["💥 Big Bang Approach"]
+        A[Original System] -->|Stop| B[Migration Window]
+        B -->|Cutover| C[New System]
+        D[⚠️ High Risk]
+        E[❌ No Rollback]
+    end
+    
+    subgraph Strangler["🌿 Strangler Fig Approach"]
+        F[Original System] --> G[Router/LB]
+        H[New System] --> G
+        I{Feature Request}
+        G -->|Feature 1| F
+        G -->|Feature 2| H
+        G -->|Feature 3| H
+        G -->|Feature N| H
+        J[✅ Low Risk]
+        K[✅ Easy Rollback]
+    end
+    
+    style BigBang fill:#e74c3c,stroke:#c0392b,stroke-width:2px,color:#fff
+    style Strangler fill:#27ae60,stroke:#2ecc71,stroke-width:2px,color:#fff
+```
+
+## Strangler Fig Migration Phases
+
+```mermaid
+graph LR
+    subgraph Phase1["Phase 1<br/>Router Setup"]
+        A[Original] --> B[Router]
+        B --> C[Original]
+        style Phase1 fill:#95a5a6,stroke:#7f8c8d,stroke-width:2px,color:#fff
+    end
+    
+    subgraph Phase2["Phase 2<br/>Read-Only"]
+        D[Original] --> E[Router]
+        E -->|Legacy| F[Original]
+        E -->|Read Only| G[New System]
+        style Phase2 fill:#3498db,stroke:#2980b9,stroke-width:2px,color:#fff
+    end
+    
+    subgraph Phase3["Phase 3<br/>Write Operations"]
+        H[Original] --> I[Router]
+        I -->|Legacy| J[Original]
+        I -->|Migrated| K[New System]
+        style Phase3 fill:#2ecc71,stroke:#27ae60,stroke-width:2px,color:#fff
+    end
+    
+    subgraph Phase4["Phase 4<br/>Complete"]
+        L[Router] --> M[New System]
+        N[✅ Legacy<br/>Decommissioned]
+        style Phase4 fill:#27ae60,stroke:#2ecc71,stroke-width:2px,color:#fff
+    end
+    
+    Phase1 --> Phase2 --> Phase3 --> Phase4
+```
+
 ## Migration Phases
 
 ### Phase 1: Parallel System Setup (Months 1-2)
