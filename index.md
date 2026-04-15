@@ -36,3 +36,14 @@
 - [[clean-room-implementation-checklist]] - Complete checklist for all phases of clean room implementation
 - [[practical-implementation-guide]] - Code templates and practical examples for implementation
 - [[delegate-task-workflows]] - Practical workflows for using delegate_task tool in clean room context
+
+
+
+## Navigation
+- [[SCHEMA]] - Wiki conventions and rules
+- [[log]] - Wiki action history
+- [[clean-room-fundamentals-diagram]] - Visual overview
+
+## Quick Links
+- [[legal/insider-knowledge-risks]] - Legal risk analysis
+- [[queries/clean-room-implementation-checklist]] - Implementation checklist

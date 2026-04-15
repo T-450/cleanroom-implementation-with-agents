@@ -84,3 +84,9 @@
 ## [2026-04-15] update | Index
 - Updated: index.md to include link to insider-knowledge-risks.md
 - Note: Total pages now 16
+
+
+
+## See Also
+- [[index]] - Current wiki catalog
+- [[SCHEMA]] - Writing conventions

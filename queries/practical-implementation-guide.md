@@ -345,11 +345,13 @@ class AgentVerifier:
         }
 ```
 
-## Related Concepts
+## Related Documentation
+- [[clean-room-engineering]] - Implementation principles
+- [[behavioral-specification]] - Test structure
+- [[test-driven-development]] - TDD workflow
+- [[ai-agent-methodologies]] - Agent integration
 
-- [[clean-room-engineering]]
-- [[behavioral-specification]]
-- [[test-driven-development]]
-- [[parallel-testing-strategy]]
-- [[ai-agent-methodologies]]
-- [[delegate-task-workflows]]
+## See Also
+- [[delegate-task-workflows]] - Agent delegation examples
+- [[legal-framework]] - Legal requirements for implementation
+- [[migration-strategy]] - Migration implementation patterns

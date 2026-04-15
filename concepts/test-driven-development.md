@@ -414,8 +414,12 @@ Before marking work complete:
 - **Not verifying against original**: Divergence from original behavior
 
 ## Related Concepts
-
 - [[behavioral-specification]]
 - [[clean-room-engineering]]
 - [[parallel-testing-strategy]]
 - [[property-based-testing]]
+- [[quality-assurance]]
+
+## See Also
+- [[practical-implementation-guide]] - TDD templates
+- [[ai-agent-methodologies]] - Agent-driven TDD

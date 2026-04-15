@@ -416,11 +416,14 @@ TIMELINE:
 ```
 
 ## Related Concepts
-
 - [[clean-room-engineering]]
 - [[parallel-testing-strategy]]
 - [[quality-assurance]]
+- [[legal-framework]]
 
+## See Also
+- [[practical-implementation-guide]] - Migration code examples
+- [[diagrams/clean-room-fundamentals-diagram]] - Migration visualization
 ## Pitfalls
 
 - **Big bang migration**: Never replace everything at once

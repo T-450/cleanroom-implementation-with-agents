@@ -351,13 +351,17 @@ def test_network_failure_recovery():
 - **Apache JMeter**: Comprehensive load testing
 
 ## Related Concepts
-
 - [[clean-room-engineering]]
 - [[test-driven-development]]
 - [[property-based-testing]]
 - [[contract-testing]]
 - [[parallel-testing-strategy]]
+- [[legal-framework]]
+- [[ai-agent-methodologies]]
 
+## See Also
+- [[practical-implementation-guide]] - Test templates
+- [[delegate-task-workflows]] - AI workflows for discovery
 ## Pitfalls
 
 - **Testing implementation details**: Test behavior, not internal structure

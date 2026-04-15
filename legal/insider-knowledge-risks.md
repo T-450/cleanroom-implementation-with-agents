@@ -575,21 +575,15 @@ REQUIRED_ACTIONS:
 ✓ Maintain complete audit trail
 ```
 
-## Related Resources
+## Related Concepts
+- [[legal-framework]] - Legal requirements
+- [[clean-room-engineering]] - Team separation
+- [[legal-risk-assessment]] - Risk comparison
 
-### Legal Framework
-- [[legal-framework]] - Clean room legal requirements
-- [[legal-risk-assessment]] - IP risk comparison
-- [[clean-room-engineering]] - Core methodology
-
-### Mitigation
-- [[clean-room-implementation-checklist]] - Compliance checklist
-- [[quality-assurance]] - Verification practices
-
-### Risk Management
-- [[migration-strategy]] - Migration risks
-- [[parallel-testing-strategy]] - Testing requirements
-
+## See Also
+- [[clean-room-implementation-checklist]] - Staffing vetting checklist
+- [[multi-agent-coordination]] - Agent isolation
+- [[legal-framework]] - Personnel separation requirements
 ## Revision History
 
 | Date | Version | Author | Changes |

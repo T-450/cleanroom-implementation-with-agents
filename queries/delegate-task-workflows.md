@@ -605,10 +605,14 @@ Agents sharing forbidden information.
 
 **Solution:** Sanitize context before passing between agent types.
 
-## Related Concepts
+## Related Documentation
+- [[ai-agent-methodologies]] - Agent methodologies
+- [[multi-agent-coordination]] - Coordination patterns
+- [[clean-room-engineering]] - Agent role separation
 
-- [[ai-agent-methodologies]]
-- [[multi-agent-coordination]]
-- [[delegate-task-workflows]]
+## See Also
+- [[practical-implementation-guide]] - Agent implementation examples
+- [[legal-framework]] - Agent isolation requirements
+- [[legal/insider-knowledge-risks]] - Agent team requirements- [[delegate-task-workflows]]
 - [[clean-room-engineering]]
 - [[test-driven-development]]

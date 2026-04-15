@@ -174,13 +174,20 @@ Trying to replace everything at once fails:
 - Maintain parallel systems during transition
 
 ## Related Concepts
-
 - [[behavioral-specification]]
 - [[test-driven-development]]
 - [[legal-framework]]
-- [[strangler-fig-pattern]]
+- [[migration-strategy]]
 - [[parallel-testing-strategy]]
+- [[quality-assurance]]
+- [[ai-agent-methodologies]]
+- [[multi-agent-coordination]]
+- [[insider-knowledge-risks]]
 
+## See Also
+- [[clean-room-fundamentals-diagram]] - Visual overview
+- [[clean-room-implementation-checklist]] - Complete checklist
+- [[practical-implementation-guide]] - Code templates
 ## Resources
 
 ### Academic Papers

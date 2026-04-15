@@ -348,12 +348,15 @@ FINAL_SIGN-OFF:
 ```
 
 ## Related Concepts
-
 - [[clean-room-engineering]]
 - [[behavioral-specification]]
 - [[legal-risk]]
 - [[quality-assurance]]
 
+## See Also
+- [[legal-risk-assessment]] - IP risk comparison
+- [[insider-knowledge-risks]] - Former employee risks
+- [[clean-room-implementation-checklist]] - Legal compliance checklist
 ## Pitfalls
 
 - **Skipping legal review**: Even "obviously safe" projects need review
