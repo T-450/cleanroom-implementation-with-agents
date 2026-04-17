@@ -1,0 +1,24 @@
+# Autoresearch Configuration: Clean Room Implementation Study Case
+# Goal: Build comprehensive practical deep-dive for clean-room engineering with AI agents
+# Metric: Coverage depth = (verified_sources * unique_insights) / (unverified_claims + missing_context)
+# Direction: Higher is better
+
+RESEARCH_SCOPES:
+- Academic foundations (IBM Clean Room, SEI, legal precedents)
+- Modern AI-enhanced implementations (LLM-driven spec extraction, agent orchestration)
+- Historical industry case studies (Chromium/Blink, Wine, ReactOS, ZFS/Btrfs)
+- AI agent workflow patterns (Hermes delegate-task, multi-agent coordination)
+
+OUTPUT_REQUIREMENTS:
+- Comprehensive study case document (3000+ words)
+- Executable checklists and decision matrices
+- Pattern library for agent-driven clean-room implementation
+- Integration guide for existing wiki structure
+
+WIKI_PATH: /home/t450/Documents/t450-workspace/clean-room-engineering-wiki/
+TARGET_DIRECTORIES:
+- case-studies/ (new)
+- patterns/ (new)  
+- lessons-learned/ (new)
+- concepts/ (enhance existing)
+- queries/ (enhance existing)
