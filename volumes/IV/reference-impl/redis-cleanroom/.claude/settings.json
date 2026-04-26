@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+      "Edit",
+      "Write",
+      "Bash(cargo:*)",
+      "Bash(just:*)",
+      "Bash(rustc:*)",
+      "Bash(redis-cli:*)",
+      "Bash(redis-server:*)",
+      "Bash(redis-benchmark:*)",
+      "Bash(nc:*)",
+      "Bash(socat:*)",
+      "Bash(printf:*)",
+      "Bash(xxd:*)",
+      "Bash(hexdump:*)",
+      "Bash(od:*)",
+      "Bash(python3:*)",
+      "Bash(uv:*)",
+      "Bash(sqlite3:*)",
+      "Bash(jq:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(./target/release/redis-cleanroom:*)",
+      "Bash(./target/debug/redis-cleanroom:*)",
+      "Task",
+      "TodoWrite",
+      "mcp__spec-store__*",
+      "mcp__parity-oracle__*",
+      "mcp__audit-log__*"
+    ],
+    "deny": [
+      "Bash(curl:*)",
+      "Bash(wget:*)",
+      "Bash(git push:*)",
+      "Bash(rm:* -rf /)"
+    ]
+  },
+  "env": {
+    "REDIS_CLEANROOM_ROOT": "${CLAUDE_PROJECT_DIR}",
+    "REDIS_ORIGINAL_BIN": "${CLAUDE_PROJECT_DIR}/original/redis-server",
+    "REDIS_NEW_BIN": "${CLAUDE_PROJECT_DIR}/target/release/redis-cleanroom",
+    "AUDIT_DB": "${CLAUDE_PROJECT_DIR}/reports/audit/audit.sqlite",
+    "COST_LEDGER": "${CLAUDE_PROJECT_DIR}/reports/audit/cost-ledger.json",
+    "TOOL_POLICY": "${CLAUDE_PROJECT_DIR}/../../schemas/tool-policy.json",
+    "ANTHROPIC_BUDGET_USD": "15.00"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Glob|Edit|Write|Bash",
+        "hooks": [
+          {"type": "command", "command": "python3 ${CLAUDE_PROJECT_DIR}/hooks/firewall.py"},
+          {"type": "command", "command": "python3 ${CLAUDE_PROJECT_DIR}/hooks/cost_cap.py"}
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {"type": "command", "command": "python3 ${CLAUDE_PROJECT_DIR}/hooks/firewall.py --task"}
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {"type": "command", "command": "python3 ${CLAUDE_PROJECT_DIR}/hooks/audit_logger.py"}
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {"type": "command", "command": "python3 ${CLAUDE_PROJECT_DIR}/hooks/redactor.py"}
+        ]
+      }
+    ],
+    "Stop": [
+      {"hooks": [{"type": "command", "command": "python3 ${CLAUDE_PROJECT_DIR}/hooks/notifier.py --stop"}]}
+    ],
+    "SubagentStop": [
+      {"hooks": [{"type": "command", "command": "python3 ${CLAUDE_PROJECT_DIR}/hooks/notifier.py --subagent-stop"}]}
+    ]
+  }
+}

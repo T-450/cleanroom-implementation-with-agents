@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cleanroom.example/schemas/spec-artifact/v1",
+  "title": "Behavioral Spec Artifact",
+  "description": "The single handoff format produced by the Observation team and consumed by Implementation and Verification. Every assertion carries a probe-id citation so that downstream agents can audit grounding and so that hallucination-introduced behavior is detectable.",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["spec_id", "target", "version", "summary", "interface", "behaviors", "edge_cases", "probes", "provenance"],
+  "additionalProperties": false,
+  "properties": {
+    "spec_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{1,63}$",
+      "description": "Stable identifier (e.g., 'set', 'expire', 'incr-overflow')."
+    },
+    "target": {
+      "type": "object",
+      "required": ["system", "feature"],
+      "additionalProperties": false,
+      "properties": {
+        "system": {"type": "string", "description": "Original system identifier (e.g., 'redis-server')."},
+        "feature": {"type": "string", "description": "Feature name (e.g., 'SET command')."},
+        "original_version": {"type": "string", "description": "Pinned version of the original system that was probed."}
+      }
+    },
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "status": {
+      "type": "string",
+      "enum": ["draft", "reviewed", "frozen", "deprecated"],
+      "default": "draft"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 2000,
+      "description": "Human-readable one-paragraph description."
+    },
+    "interface": {
+      "type": "object",
+      "required": ["wire_format", "request", "response"],
+      "additionalProperties": false,
+      "properties": {
+        "wire_format": {"type": "string", "description": "e.g., 'RESP2', 'HTTP/1.1', 'Unix domain socket'."},
+        "request": {
+          "type": "object",
+          "description": "Structured request shape: argument names, types, multiplicity, defaults.",
+          "additionalProperties": true
+        },
+        "response": {
+          "type": "object",
+          "description": "Structured response shape: success type, error types.",
+          "additionalProperties": true
+        }
+      }
+    },
+    "behaviors": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Each behavior is an observable input/output rule grounded in at least one probe.",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "preconditions", "input", "output", "probe_refs"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^B-[a-z0-9_-]+$"},
+          "description": {"type": "string"},
+          "preconditions": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "State assumptions before the behavior applies."
+          },
+          "input": {"type": "object", "additionalProperties": true},
+          "output": {"type": "object", "additionalProperties": true},
+          "side_effects": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Observable state changes (e.g., 'key TTL set to N')."
+          },
+          "probe_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "pattern": "^P-[0-9]+$"},
+            "description": "References to entries in the probes[] array. Empty arrays are forbidden so every claim is grounded."
+          }
+        }
+      }
+    },
+    "edge_cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "description", "input", "expected", "probe_refs"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^E-[a-z0-9_-]+$"},
+          "description": {"type": "string"},
+          "input": {"type": "object", "additionalProperties": true},
+          "expected": {"type": "object", "additionalProperties": true},
+          "probe_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "pattern": "^P-[0-9]+$"}
+          }
+        }
+      }
+    },
+    "invariants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "statement"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^I-[a-z0-9_-]+$"},
+          "statement": {"type": "string"},
+          "probe_refs": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^P-[0-9]+$"}
+          }
+        }
+      }
+    },
+    "probes": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The black-box experiments that grounded this spec. Probe ids are referenced from behaviors[], edge_cases[], and invariants[].",
+      "items": {
+        "type": "object",
+        "required": ["id", "command", "stdout", "exit_code", "timestamp"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^P-[0-9]+$"},
+          "command": {"type": "string", "description": "Exact shell or RESP command sent to the original system."},
+          "stdin": {"type": "string"},
+          "stdout": {"type": "string"},
+          "stderr": {"type": "string"},
+          "exit_code": {"type": "integer"},
+          "wire_capture": {"type": "string", "description": "Hex-encoded raw bytes if applicable."},
+          "duration_ms": {"type": "number", "minimum": 0},
+          "timestamp": {"type": "string", "format": "date-time"},
+          "transcript_ref": {
+            "type": "string",
+            "description": "Path under specs-raw/ or transcripts/observation/ from which this probe was extracted."
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["extracted_by", "extracted_at", "session_id"],
+      "additionalProperties": false,
+      "properties": {
+        "extracted_by": {"type": "string", "description": "Subagent name (e.g., 'spec-extractor')."},
+        "extracted_at": {"type": "string", "format": "date-time"},
+        "session_id": {"type": "string"},
+        "reviewed_by": {"type": "string"},
+        "reviewed_at": {"type": "string", "format": "date-time"},
+        "schema_version": {"type": "string", "default": "1.0.0"}
+      }
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Behaviors the extractor was unable to fully ground; downstream agents must not assume answers."
+    }
+  }
+}

@@ -1,0 +1,113 @@
+# redis-cleanroom — task runner
+
+set shell := ["bash", "-uc"]
+
+# Default target: list available recipes.
+default:
+    @just --list
+
+# === Bootstrap ===
+
+# Set up uv venvs for the three MCP servers, pin redis-server, init audit DB.
+bootstrap: bootstrap-mcps bootstrap-original bootstrap-audit-db bootstrap-cost-ledger
+    @echo "redis-cleanroom: bootstrap complete."
+
+bootstrap-mcps:
+    @for d in mcp-servers/spec-store mcp-servers/parity-oracle mcp-servers/audit-log; do \
+        if [ -f "$d/pyproject.toml" ]; then \
+            echo ">> uv sync in $d"; \
+            (cd "$d" && uv sync) || exit 1; \
+        fi; \
+    done
+
+bootstrap-original:
+    @if [ ! -f original/redis-server ]; then \
+        echo ">> Pinning redis-server into original/"; \
+        which redis-server > /dev/null || { echo "Install redis-server first (apt install redis)"; exit 1; }; \
+        cp "$(which redis-server)" original/redis-server; \
+        redis-server --version | head -1 > original/VERSION; \
+        echo "Pinned: $(cat original/VERSION)"; \
+    fi
+    @if [ ! -f original/LICENSE.txt ]; then \
+        echo "Original Redis is governed by the upstream Redis license; this directory contains a binary copy used solely as a parity oracle by the Verification team. Implementation team must NEVER read these files." > original/LICENSE.txt; \
+    fi
+
+bootstrap-audit-db:
+    @mkdir -p reports/audit
+    @sqlite3 reports/audit/audit.sqlite "PRAGMA journal_mode=WAL; CREATE TABLE IF NOT EXISTS init(t TEXT); INSERT INTO init VALUES (datetime('now'));"
+
+bootstrap-cost-ledger:
+    @mkdir -p reports/audit
+    @if [ ! -f reports/audit/cost-ledger.json ]; then \
+        echo '{"session_id":"bootstrap","started_at":"'"$(date -u +%FT%TZ)"'","budget_usd":15.0,"spent_usd":0.0,"remaining_usd":15.0,"events":[],"denials":[]}' > reports/audit/cost-ledger.json; \
+    fi
+
+# === Smoke / pipeline ===
+
+# Discover, implement, and verify a single command end to end.
+smoke: bootstrap
+    @just full-pipeline PING
+
+# Run the full clean-room pipeline for one command.
+full-pipeline COMMAND:
+    @claude -p "/run-cleanroom-pipeline {{COMMAND}}"
+
+# Discover only (Observation team).
+discover COMMAND:
+    @claude -p "/discover-command {{COMMAND}}"
+
+# Generate tests only (after a frozen spec exists).
+generate-tests SPEC_ID:
+    @claude -p "/generate-tests {{SPEC_ID}}"
+
+# Implement only (after frozen spec + tests exist).
+implement SPEC_ID:
+    @claude -p "/implement-command {{SPEC_ID}}"
+
+# Verify parity for a command.
+verify COMMAND:
+    @claude -p "/verify-parity {{COMMAND}}"
+
+# === Verification of the firewall itself ===
+
+# Confirm the firewall denies an implementer trying to read original/.
+verify-firewall:
+    @echo ">> Red-team: implementer attempts to Read original/redis-server"
+    @claude -p "/verify-firewall-redteam"
+    @echo ">> Audit log denial check (must be > 0):"
+    @sqlite3 reports/audit/audit.sqlite \
+        "SELECT count(*) FROM events WHERE decision='denied' AND agent_role='implementation'"
+    @echo ">> Coordinator Task-prompt forbidden-token check (must be 0):"
+    @sqlite3 reports/audit/audit.sqlite \
+        "SELECT count(*) FROM events WHERE tool='Task' AND json_extract(event_json, '$.task_prompt_redaction.matched_forbidden_tokens') != '[]'"
+
+# Confirm the cost cap aborts cleanly under a tight budget.
+verify-cost-cap:
+    @echo ">> Setting budget to $0.10 and attempting /implement-command..."
+    @ANTHROPIC_BUDGET_USD=0.10 claude -p "/implement-command set"
+    @echo ">> Working tree must be clean (cost-cap aborted before any Edit):"
+    @git -C $(git rev-parse --show-toplevel) status -s -- volumes/IV/reference-impl/redis-cleanroom/src
+
+# === Diagnostics ===
+
+# Surface-test every primitive: hooks fire, MCP servers respond, subagents listed.
+doctor:
+    @echo ">> .claude/agents/:"
+    @ls .claude/agents/
+    @echo ">> .claude/commands/:"
+    @ls .claude/commands/
+    @echo ">> .claude/skills/:"
+    @ls .claude/skills/
+    @echo ">> hooks/:"
+    @python3 hooks/firewall.py < /dev/null || true
+    @python3 hooks/audit_logger.py < /dev/null || true
+    @echo ">> .mcp.json:"
+    @python3 -c "import json; print(list(json.load(open('.mcp.json'))['mcpServers']))"
+
+# Drain audit queue manually (normally lazy).
+drain-audit:
+    @claude -p "/audit-replay --drain"
+
+clean:
+    @rm -rf target reports/parity reports/audit/events.jsonl reports/audit/stop-events.jsonl
+    @echo "Cleaned generated outputs (kept audit DB and cost ledger)."

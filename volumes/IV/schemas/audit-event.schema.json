@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cleanroom.example/schemas/audit-event/v1",
+  "title": "Audit Event",
+  "description": "Single row of the append-only audit log. Emitted by the audit_logger.py PostToolUse hook and (for Task delegations) by the coordinator subagent. Consumed by the audit-log MCP server, the /audit-replay slash command, and by verify-firewall sanity checks. The schema is locked because legal replay depends on it.",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["event_id", "session_id", "timestamp", "agent_role", "agent_name", "tool", "decision"],
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {"type": "string", "pattern": "^evt-[0-9a-f]{16}$"},
+    "session_id": {"type": "string"},
+    "parent_event_id": {"type": "string", "pattern": "^evt-[0-9a-f]{16}$", "description": "If this event was triggered by a parent (e.g., a coordinator Task call), reference it here."},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "agent_name": {
+      "type": "string",
+      "description": "Subagent file name without .md (e.g., 'tdd-implementer') or 'main' for the top-level session."
+    },
+    "agent_role": {
+      "type": "string",
+      "enum": ["coordinator", "observation", "implementation", "verification", "main"],
+      "description": "Drives firewall.py policy decisions."
+    },
+    "tool": {
+      "type": "string",
+      "description": "Tool name (Read, Edit, Write, Bash, Grep, Glob, Task, mcp__*, etc.)."
+    },
+    "input_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "SHA-256 of the tool input. Hashed not stored to keep the log small and to avoid leaking tool inputs in shared logs."
+    },
+    "input_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Selected non-sensitive input fields (e.g., for Read: just the path; for Bash: just the command name and first arg). Schema-free per tool."
+    },
+    "output_hash": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "duration_ms": {"type": "number", "minimum": 0},
+    "decision": {
+      "type": "string",
+      "enum": ["allowed", "denied", "redacted", "errored"],
+      "description": "What firewall.py / cost_cap.py / the tool itself decided."
+    },
+    "denial_reason": {
+      "type": "string",
+      "description": "Set when decision == 'denied'. References a rule id from tool-policy.schema.json."
+    },
+    "policy_version": {
+      "type": "string",
+      "description": "Version of tool-policy.json in effect when the decision was made."
+    },
+    "task_prompt_redaction": {
+      "type": "object",
+      "description": "When tool == 'Task' (coordinator delegation): forbidden-token grep result. Logged so verify-firewall can replay.",
+      "additionalProperties": false,
+      "properties": {
+        "matched_forbidden_tokens": {"type": "array", "items": {"type": "string"}},
+        "prompt_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+      }
+    },
+    "cost_usd": {"type": "number", "minimum": 0, "description": "Estimated cost contribution of this tool call to the session ledger."}
+  }
+}

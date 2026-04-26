@@ -1,0 +1,205 @@
+{
+  "policy_version": "1.0.0",
+  "default": "deny",
+  "roles": {
+    "coordinator": "coordinator",
+    "triage": "coordinator",
+    "escalation": "coordinator",
+    "spec-extractor": "observation",
+    "probe-runner": "observation",
+    "spec-reviewer": "observation",
+    "test-generator": "verification",
+    "test-curator": "verification",
+    "tdd-implementer": "implementation",
+    "refactorer": "implementation",
+    "dependency-curator": "implementation",
+    "build-doctor": "implementation",
+    "parity-runner": "verification",
+    "divergence-triager": "verification",
+    "certifier": "verification"
+  },
+  "rules": [
+    {
+      "id": "R-impl-no-original",
+      "description": "Implementation may never read original system source, raw probe transcripts, or observation reasoning traces.",
+      "effect": "deny",
+      "roles": ["implementation"],
+      "tools": ["Read", "Grep", "Glob", "Edit", "Write"],
+      "path_patterns": [
+        "original/**",
+        "specs-raw/**",
+        "transcripts/observation/**",
+        "reports/audit/**"
+      ],
+      "rationale": "File-level half of the legal firewall. Prose-level half is the coordinator contract."
+    },
+    {
+      "id": "R-impl-no-original-bash",
+      "description": "Implementation may not invoke shell commands that touch original/.",
+      "effect": "deny",
+      "roles": ["implementation"],
+      "tools": ["Bash"],
+      "path_patterns": ["original/**", "specs-raw/**", "transcripts/observation/**"],
+      "rationale": "Closes the Bash-shell escape on the file rule."
+    },
+    {
+      "id": "R-impl-no-redis-cli",
+      "description": "Implementation must not connect to a live original redis-server.",
+      "effect": "deny",
+      "roles": ["implementation"],
+      "tools": ["Bash:redis-cli:*", "Bash:redis-benchmark:*"],
+      "rationale": "Implementation works from spec + tests only, never from a running original."
+    },
+    {
+      "id": "R-obs-no-src",
+      "description": "Observation must not read the new implementation's source.",
+      "effect": "deny",
+      "roles": ["observation"],
+      "tools": ["Read", "Grep", "Glob"],
+      "path_patterns": ["src/**"],
+      "rationale": "Prevents Observation from biasing toward the implementation's choices."
+    },
+    {
+      "id": "R-verif-no-obs-traces",
+      "description": "Verification must not read observation reasoning traces.",
+      "effect": "deny",
+      "roles": ["verification"],
+      "tools": ["Read", "Grep", "Glob"],
+      "path_patterns": ["transcripts/observation/**"],
+      "rationale": "Verification works from spec + binaries, not from how the spec was derived."
+    },
+    {
+      "id": "R-verif-no-src-write",
+      "description": "Verification proposes via test fixtures; never writes src/.",
+      "effect": "deny",
+      "roles": ["verification"],
+      "tools": ["Edit", "Write"],
+      "path_patterns": ["src/**"],
+      "rationale": "Maintains team separation — fixes flow back through the coordinator to the implementation team."
+    },
+    {
+      "id": "R-coord-no-direct-edit",
+      "description": "Coordinator never edits files directly. It only delegates via Task.",
+      "effect": "deny",
+      "roles": ["coordinator"],
+      "tools": ["Edit", "Write"],
+      "rationale": "Keeps the coordinator's responsibilities prose-level, so the contract is auditable."
+    },
+    {
+      "id": "R-allow-read-public",
+      "description": "All roles may read schemas, public tests, and their own role's overlay.",
+      "effect": "allow",
+      "roles": ["*"],
+      "tools": ["Read", "Grep", "Glob"],
+      "path_patterns": [
+        "specs/**",
+        "tests/parity/**",
+        "tests/properties/**",
+        "Cargo.toml",
+        "Cargo.lock",
+        ".dep-allowlist.toml",
+        "CLAUDE.md",
+        "README.md",
+        "justfile"
+      ],
+      "rationale": "Common ground."
+    },
+    {
+      "id": "R-allow-cargo-impl",
+      "description": "Implementation may run cargo build/test/fmt/clippy.",
+      "effect": "allow",
+      "roles": ["implementation"],
+      "tools": ["Bash:cargo:*"]
+    },
+    {
+      "id": "R-allow-edit-impl",
+      "description": "Implementation writes src/ and tests/properties/.",
+      "effect": "allow",
+      "roles": ["implementation"],
+      "tools": ["Edit", "Write"],
+      "path_patterns": ["src/**", "tests/properties/**", "Cargo.toml", "Cargo.lock"]
+    },
+    {
+      "id": "R-allow-obs-probes",
+      "description": "Observation may probe the original via redis-cli/nc/socat/etc.",
+      "effect": "allow",
+      "roles": ["observation"],
+      "tools": [
+        "Bash:redis-cli:*",
+        "Bash:redis-server:*",
+        "Bash:nc:*",
+        "Bash:socat:*",
+        "Bash:printf:*",
+        "Bash:xxd:*",
+        "Bash:hexdump:*",
+        "Bash:od:*",
+        "Bash:python3:*"
+      ]
+    },
+    {
+      "id": "R-allow-obs-write",
+      "description": "Observation writes specs/, specs-raw/, transcripts/observation/.",
+      "effect": "allow",
+      "roles": ["observation"],
+      "tools": ["Edit", "Write"],
+      "path_patterns": ["specs/**", "specs-raw/**", "transcripts/observation/**"]
+    },
+    {
+      "id": "R-allow-obs-read-original",
+      "description": "Observation reads the original binary and version notes.",
+      "effect": "allow",
+      "roles": ["observation"],
+      "tools": ["Read", "Grep", "Glob", "Bash:ls:*", "Bash:cat:*"],
+      "path_patterns": ["original/**"]
+    },
+    {
+      "id": "R-allow-verif-read-all",
+      "description": "Verification reads everything except observation traces.",
+      "effect": "allow",
+      "roles": ["verification"],
+      "tools": ["Read", "Grep", "Glob"],
+      "path_patterns": ["original/**", "src/**", "tests/**", "specs/**", "reports/**"]
+    },
+    {
+      "id": "R-allow-verif-write",
+      "description": "Verification writes parity reports and regression fixtures.",
+      "effect": "allow",
+      "roles": ["verification"],
+      "tools": ["Edit", "Write"],
+      "path_patterns": [
+        "reports/parity/**",
+        "reports/audit/**",
+        "tests/parity/*/regressions/**"
+      ]
+    },
+    {
+      "id": "R-allow-verif-bash",
+      "description": "Verification may exercise both binaries.",
+      "effect": "allow",
+      "roles": ["verification"],
+      "tools": [
+        "Bash:redis-cli:*",
+        "Bash:redis-benchmark:*",
+        "Bash:redis-server:*",
+        "Bash:./target/release/redis-cleanroom:*",
+        "Bash:./target/debug/redis-cleanroom:*",
+        "Bash:cargo:*"
+      ]
+    },
+    {
+      "id": "R-allow-task-coord",
+      "description": "Only the coordinator (and its triage/escalation peers) may invoke Task.",
+      "effect": "allow",
+      "roles": ["coordinator"],
+      "tools": ["Task"]
+    },
+    {
+      "id": "R-deny-task-others",
+      "description": "Non-coordinators may not invoke Task.",
+      "effect": "deny",
+      "roles": ["observation", "implementation", "verification"],
+      "tools": ["Task"],
+      "rationale": "Delegation is a coordinator-only privilege so the prose-level firewall has a single audit point."
+    }
+  ]
+}

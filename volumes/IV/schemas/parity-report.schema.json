@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cleanroom.example/schemas/parity-report/v1",
+  "title": "Parity Report",
+  "description": "Output of a differential parity run. Compares the new implementation byte-for-byte (or by structured diff for non-byte protocols) against the original system across a test corpus. Consumed by Verification subagents (parity-runner, divergence-triager, certifier) and by CI gating.",
+  "version": "1.0.0",
+  "type": "object",
+  "required": ["report_id", "spec_id", "ran_at", "implementation", "original", "summary", "cases"],
+  "additionalProperties": false,
+  "properties": {
+    "report_id": {"type": "string", "pattern": "^report-[0-9]{8}T[0-9]{6}-[a-z0-9]{6}$"},
+    "spec_id": {"type": "string", "pattern": "^[a-z][a-z0-9_-]{1,63}$"},
+    "ran_at": {"type": "string", "format": "date-time"},
+    "implementation": {
+      "type": "object",
+      "required": ["name", "binary", "version", "git_sha"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "binary": {"type": "string"},
+        "version": {"type": "string"},
+        "git_sha": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"}
+      }
+    },
+    "original": {
+      "type": "object",
+      "required": ["name", "binary", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "binary": {"type": "string"},
+        "version": {"type": "string"}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["total", "pass", "fail", "skip", "parity_rate"],
+      "additionalProperties": false,
+      "properties": {
+        "total": {"type": "integer", "minimum": 0},
+        "pass": {"type": "integer", "minimum": 0},
+        "fail": {"type": "integer", "minimum": 0},
+        "skip": {"type": "integer", "minimum": 0},
+        "parity_rate": {"type": "number", "minimum": 0, "maximum": 1, "description": "pass / (pass + fail). Skipped cases are excluded from the denominator."},
+        "deterministic_subset_pass_rate": {"type": "number", "minimum": 0, "maximum": 1, "description": "Required to be 1.0 for CI to pass on the deterministic subset."}
+      }
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["case_id", "input", "expected", "actual", "result"],
+        "additionalProperties": false,
+        "properties": {
+          "case_id": {"type": "string"},
+          "family": {"type": "string", "enum": ["example", "property", "differential"]},
+          "deterministic": {"type": "boolean", "default": true},
+          "input": {"type": "object", "additionalProperties": true},
+          "expected": {"type": "object", "additionalProperties": true, "description": "Output captured from the original system."},
+          "actual": {"type": "object", "additionalProperties": true, "description": "Output captured from the new implementation."},
+          "result": {"type": "string", "enum": ["pass", "fail", "skip", "error"]},
+          "diff": {"type": "string", "description": "Structured or unified-diff representation when result != pass."},
+          "classification": {
+            "type": "string",
+            "enum": ["spec-gap", "impl-bug", "oracle-bug", "nondeterminism", "unclassified"],
+            "description": "Set by divergence-triager subagent."
+          },
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "tolerance_band": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "min_parity_rate": {"type": "number", "minimum": 0, "maximum": 1, "default": 0.99},
+        "deterministic_subset_required": {"type": "number", "minimum": 0, "maximum": 1, "default": 1.0}
+      }
+    },
+    "certifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "decision": {"type": "string", "enum": ["pass", "fail", "needs-review"]},
+        "decided_by": {"type": "string"},
+        "decided_at": {"type": "string", "format": "date-time"},
+        "rationale": {"type": "string"}
+      }
+    }
+  }
+}

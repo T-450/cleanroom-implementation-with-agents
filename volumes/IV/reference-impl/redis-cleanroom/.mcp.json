@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "spec-store": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["--directory", "${CLAUDE_PROJECT_DIR}/mcp-servers/spec-store", "run", "server.py"],
+      "env": {
+        "SPEC_DIR": "${CLAUDE_PROJECT_DIR}/specs",
+        "SPEC_SCHEMA": "${CLAUDE_PROJECT_DIR}/../../schemas/spec-artifact.schema.json"
+      }
+    },
+    "parity-oracle": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["--directory", "${CLAUDE_PROJECT_DIR}/mcp-servers/parity-oracle", "run", "server.py"],
+      "env": {
+        "REDIS_ORIGINAL_BIN": "${CLAUDE_PROJECT_DIR}/original/redis-server",
+        "REDIS_NEW_BIN": "${CLAUDE_PROJECT_DIR}/target/release/redis-cleanroom",
+        "PARITY_REPORT_SCHEMA": "${CLAUDE_PROJECT_DIR}/../../schemas/parity-report.schema.json",
+        "REPORTS_DIR": "${CLAUDE_PROJECT_DIR}/reports/parity"
+      }
+    },
+    "audit-log": {
+      "type": "stdio",
+      "command": "uv",
+      "args": ["--directory", "${CLAUDE_PROJECT_DIR}/mcp-servers/audit-log", "run", "server.py"],
+      "env": {
+        "AUDIT_DB": "${CLAUDE_PROJECT_DIR}/reports/audit/audit.sqlite",
+        "AUDIT_EVENT_SCHEMA": "${CLAUDE_PROJECT_DIR}/../../schemas/audit-event.schema.json"
+      }
+    }
+  }
+}

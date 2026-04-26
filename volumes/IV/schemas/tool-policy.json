@@ -1,0 +1,84 @@
+{
+  "policy_version": "1.0.0",
+  "default": "allow",
+  "roles": {
+    "coordinator": "coordinator",
+    "triage": "coordinator",
+    "escalation": "coordinator",
+    "spec-extractor": "observation",
+    "probe-runner": "observation",
+    "spec-reviewer": "observation",
+    "test-generator": "verification",
+    "test-curator": "verification",
+    "tdd-implementer": "implementation",
+    "refactorer": "implementation",
+    "dependency-curator": "implementation",
+    "build-doctor": "implementation",
+    "parity-runner": "verification",
+    "divergence-triager": "verification",
+    "certifier": "verification"
+  },
+  "rules": [
+    {
+      "id": "R-impl-no-original",
+      "description": "Implementation team must not Read/Grep/Glob anything under original/, specs-raw/, transcripts/observation/, reports/audit/.",
+      "effect": "deny",
+      "roles": ["implementation"],
+      "tools": ["Read", "Grep", "Glob", "Edit", "Write"],
+      "path_patterns": ["original/**", "specs-raw/**", "transcripts/observation/**", "reports/audit/**"],
+      "rationale": "Legal firewall: Implementation may never see the original source or the raw observation transcripts."
+    },
+    {
+      "id": "R-impl-bash-no-original",
+      "description": "Implementation team must not run Bash commands that target original/, specs-raw/, transcripts/observation/.",
+      "effect": "deny",
+      "roles": ["implementation"],
+      "tools": ["Bash"],
+      "path_patterns": ["**/original/**", "**/specs-raw/**", "**/transcripts/observation/**"],
+      "rationale": "Defense-in-depth: even shell commands cannot reach forbidden paths."
+    },
+    {
+      "id": "R-impl-no-redis-cli",
+      "description": "Implementation may not invoke redis-cli (which would let them probe the original).",
+      "effect": "deny",
+      "roles": ["implementation"],
+      "tools": ["Bash:redis-cli:*", "Bash:redis-server:*", "Bash:redis-benchmark:*"],
+      "rationale": "Implementation must work from frozen specs and tests, never live probing."
+    },
+    {
+      "id": "R-verification-no-obs-transcripts",
+      "description": "Verification may not Read transcripts/observation/.",
+      "effect": "deny",
+      "roles": ["verification"],
+      "tools": ["Read", "Grep", "Glob"],
+      "path_patterns": ["transcripts/observation/**"],
+      "rationale": "Quarantine reasoning traces; verification works from spec + code + parity oracle."
+    },
+    {
+      "id": "R-verification-no-src-write",
+      "description": "Verification proposes; implementation disposes.",
+      "effect": "deny",
+      "roles": ["verification"],
+      "tools": ["Edit", "Write"],
+      "path_patterns": ["src/**"],
+      "rationale": "Keeps verification independent."
+    },
+    {
+      "id": "R-observation-no-src",
+      "description": "Observation must not see implementation source.",
+      "effect": "deny",
+      "roles": ["observation"],
+      "tools": ["Read", "Grep", "Glob"],
+      "path_patterns": ["src/**"],
+      "rationale": "Prevents observation from biasing future spec extractions toward what the impl already does."
+    },
+    {
+      "id": "R-only-coordinator-task",
+      "description": "Only the coordinator subagent may use the Task tool.",
+      "effect": "deny",
+      "roles": ["observation", "implementation", "verification"],
+      "tools": ["Task"],
+      "rationale": "Centralized delegation = a single chokepoint for the prose-level firewall."
+    }
+  ]
+}
