@@ -1,0 +1,12 @@
+[project]
+name = "redis-cleanroom-spec-store"
+version = "0.1.0"
+description = "MCP server: validated CRUD over spec-artifact JSON files."
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.0",
+    "jsonschema>=4.20",
+]
+
+[tool.uv]
+package = false
